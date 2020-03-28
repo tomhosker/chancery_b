@@ -69,6 +69,40 @@ class Extractor:
         result = result.replace("#DIGISTAMP", self.block["stamp"])
         return result
 
+    # Check that the block isn't a forgery.
+    def authenticate(self):
+        self.compare_hashes()
+        self.verify_stamp()
+
+    # Compare the "prev" field of this block with the hash of the previous.
+    def compare_hashes(self):
+        if self.ordinal == 1:
+            if self.block["prev"] != "genesis":
+                raise Exception("Block with ordinal=1 should be the "+
+                                "genesis block.")
+            else:
+                return
+        prev_ordinal = self.ordinal-1
+        connection = sqlite3.connect("ledger.db")
+        c = connection.cursor()
+        query = "SELECT hash FROM Block WHERE ordinal = ?;"
+        c.execute(query, (prev_ordinal,))
+        extract = c.fetchone()
+        connection.close()
+        prev_hash = extract["0"]
+        if prev_hash != self.block["prev"]:
+            raise Exception("Block with ordinal="+str(self.ordinal)+" is "+
+                            "not authentic: \"prev\" does not match "+
+                            "previous \"hash\".")
+
+    # Check that this block's stamp is in order.
+    def verify_stamp(self):
+        v = Verifier(self.block["stamp"], self.block["hash"])
+        if v.verify() == False:
+            raise Exception("Block with ordinal="+str(self.ordinal)+" is "+
+                            "not authentic: \"prev\" does not match "+
+                            "previous \"hash\".")
+
     # Ronseal.
     def write_main_tex(self):
         f = open("latexery/main.tex", "w")
@@ -101,6 +135,7 @@ class Extractor:
 
     # Do the thing.
     def extract(self):
+        self.authenticate()
         self.write_main_tex()
         self.compile_main_tex()
         self.create_and_copy()
@@ -132,7 +167,7 @@ def demo():
 
 def run():
     if len(sys.argv) == 2:
-        e = Extractor(sys.argv[1])
+        e = Extractor(int(sys.argv[1]))
         e.extract()
     else:
         print("Please run me with exactly one argument, the number of the "+

@@ -95,10 +95,10 @@ class Block_of_Ledger:
         self.year = dt.year
         self.month = dt.month
         self.day = dt.day
-        self.stamp = Stamp_Machine().make_stamp()
         self.annexe = annexe_to_bytes()
         self.prev = None
         self.the_hash = None
+        self.stamp = None
 
     # Assign a value to the "ordinal" field of this object.
     def set_ordinal(self, ordinal):
@@ -111,6 +111,7 @@ class Block_of_Ledger:
     # Assign a value to the "the_hash" field of this object.
     def set_the_hash(self, the_hash):
         self.the_hash = the_hash
+        self.stamp = Stamp_Machine(self.the_hash).make_stamp()
 
 # A function which allows queries to return dictionaries, rather than the
 # default tuples.

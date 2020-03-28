@@ -17,8 +17,6 @@ path_to_public_key = path_to_digistamp+"stamp_public_key.pem"
 public_exponent = 65537
 key_size = 2048
 encoding = "utf-8"
-month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-               "Sep", "Oct", "Nov", "Dec"]
 
 ################
 # MAIN CLASSES #
@@ -27,18 +25,17 @@ month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 # A class which produces a string which testifies as to the authenticity of
 # a given document.
 class Stamp_Machine:
-    def __init__(self):
+    def __init__(self, data):
         if os.path.exists(path_to_private_key) == False:
             raise Exception("No private key on disk.")
         self.private_key = load_private_key()
-        self.stamp = self.make_stamp()
+        self.data = data
 
     # Ronseal.
     def make_stamp(self):
-        message = make_stamping_clause_today()
-        message_bytes = bytes(message, encoding)
+        data_bytes = bytes(self.data, encoding)
         result_bytes = self.private_key.sign(
-                           message_bytes,
+                           data_bytes,
                            padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
                                        salt_length=padding.PSS.MAX_LENGTH),
                            hashes.SHA256())
@@ -47,21 +44,21 @@ class Stamp_Machine:
 
 # A class which allows the user to verify a stamp produced as above.
 class Verifier:
-    def __init__(self, stamp, year_no, month_no, day_no):
+    def __init__(self, stamp, data):
         if isinstance(stamp, str) == False:
             raise Exception("")
         self.stamp_str = stamp
         self.stamp_bytes = bytes.fromhex(stamp)
         self.public_key = load_public_key()
-        self.message = make_stamping_clause(year_no, month_no, day_no)
+        self.data = data
 
     # Decide whether the stamp in question is authentic or not.
     def verify(self):
-        message_bytes = bytes(self.message, encoding)
+        data_bytes = bytes(self.data, encoding)
         try:
             self.public_key.verify(
                 self.stamp_bytes,
-                message_bytes,
+                data_bytes,
                 padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
                             salt_length=padding.PSS.MAX_LENGTH),
                 hashes.SHA256())
@@ -133,33 +130,15 @@ def load_public_key():
                                                backend=default_backend())
     return result
 
-# Make the clause with which a document is stamped.
-def make_stamping_clause(year_no, month_no, day_no):
-    year = str(year_no)
-    month = month_names[month_no-1]
-    day = str(day_no)
-    if len(day) == 1:
-        day = "0"+day
-    result =  ("I, The Honourable The Chancellor of Cyprus, stamped this "+
-               "document on "+day+" "+month+" "+year+".")
-    return result
-
-# As above, but for today's date.
-def make_stamping_clause_today():
-    dt = datetime.datetime.now()
-    result = make_stamping_clause(dt.year, dt.month, dt.day)
-    return result
-
 ###########
 # TESTING #
 ###########
 
 # Run the unit tests.
 def test():
-    dt = datetime.datetime.now()
-    stamp = Stamp_Machine().make_stamp()
-    assert(Verifier(stamp, dt.year, dt.month, dt.day).verify())
-    assert(Verifier(stamp, 1, 2, 3).verify() == False)
+    stamp = Stamp_Machine("123").make_stamp()
+    assert(Verifier(stamp, "123").verify())
+    assert(Verifier(stamp, "abc").verify() == False)
     print("Tests passed!")
 
 ###################
