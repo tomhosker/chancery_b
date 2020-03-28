@@ -1,0 +1,40 @@
+\documentclass[varwidth=true,border=50pt]{standalone}
+
+\usepackage{amsfonts,fancyhdr,graphicx,mathtools,microtype,seqsplit,
+            subcaption}
+
+\begin{document}
+
+\noindent \includegraphics[width=\textwidth]{le_roi_le_veult}
+
+\vspace{10pt}
+
+\textit{By His Majesty's command, and by virtue of the authority given me by the same, I, The Honourable The Chancellor of Cyprus, hereby announce, affirm and report that \textbf{The Ducal Will and Pleasure} is as follows.}\\
+
+#BODY\\
+
+\textit{In witness of the above, this shall be sufficient warrant.}
+
+\vspace{20pt}
+
+\begin{figure}
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=20pt]{c}\\
+    \vspace{5pt}
+    \textbf{The Chancellor}\\
+    #DAY_STR #MONTH_STR #YEAR
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=0.5\textwidth]{stamp}
+\end{subfigure}%
+\end{figure}
+
+\vspace{30pt}
+
+\hfill {\footnotesize \texttt{WNT#PACKED_ORDINAL}}\\
+{\tiny \texttt{\seqsplit{#DIGISTAMP}}}
+
+\end{document}

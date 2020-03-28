@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd installation/
+sh install_big_stuff
+sh install_packages
+cd ..
