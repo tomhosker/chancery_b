@@ -51,9 +51,8 @@ class Extractor:
         else:
             raise Exception("Invalid ordinanceType: "+
                             self.block["ordinanceType"])
-        base_file = open(path_to_base, "r")
-        result = base_file.read()
-        base_file.close()
+        with open(path_to_base, "r") as base_file:
+            result = base_file.read()
         return result
 
     def make_main_tex(self):
@@ -111,9 +110,8 @@ class Extractor:
 
     def write_main_tex(self):
         """ Ronseal. """
-        main_tex = open("latexery/main.tex", "w")
-        main_tex.write(self.main_tex)
-        main_tex.close()
+        with open("latexery/main.tex", "w") as main_tex:
+            main_tex.write(self.main_tex)
 
     def compile_main_tex(self):
         """ Compile the PDF. """
@@ -123,21 +121,18 @@ class Extractor:
 
     def create_and_copy(self):
         """ Create the directory, and copy the PDF into it. """
-        script1 = ("cd extracts/\n"+
-                   "mkdir "+str(self.ordinal)+"/")
-        script2 = "cp latexery/main.pdf extracts/"+str(self.ordinal)+"/"
         if os.path.isdir("extracts/"+str(self.ordinal)+"/"):
             os.system("rm -r extracts/"+str(self.ordinal)+"/")
-        os.system(script1)
-        os.system(script2)
+        os.system("mkdir extracts/"+str(self.ordinal)+"/")
+        os.system("cp latexery/main.pdf extracts/"+str(self.ordinal)+"/")
 
     def write_annexe_zip(self):
         """ Write annexe to a file in the directory. """
         if self.block["annexe"] is None:
             return
-        annexe_zip = open("extracts/"+str(self.ordinal)+"/annexe.zip", "wb")
-        annexe_zip.write(self.block["annexe"])
-        annexe_zip.close()
+        with open("extracts/"+str(self.ordinal)+"/annexe.zip", "wb") \
+            as annexe_zip:
+            annexe_zip.write(self.block["annexe"])
 
     def extract(self):
         """ Do the thing. """

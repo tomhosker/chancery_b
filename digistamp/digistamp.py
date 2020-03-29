@@ -51,7 +51,6 @@ class Verifier:
     """ A class which allows the user to verify a stamp produced as
     above. """
     def __init__(self, stamp, data):
-        self.stamp_str = stamp
         self.stamp_bytes = bytes.fromhex(stamp)
         self.public_key = load_public_key()
         self.data = data
@@ -86,7 +85,8 @@ def get_bytes_password_new():
     password = getpass.getpass(prompt="Digistamp password: ")
     password_ = getpass.getpass(prompt="Confirm password: ")
     if password != password_:
-        raise Exception("Passwords do not match.")
+        print("Passwords do not match.")
+        return get_bytes_password_new()
     result = bytes(password, ENCODING)
     return result
 
@@ -94,11 +94,10 @@ def generate_public_key(private_key):
     """ Generate a public key from a private key object. """
     public_key = private_key.public_key()
     pem = public_key.public_bytes(
-        ENCODING=serialization.Encoding.PEM,
+        encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo)
-    public_key_file = open(PATH_TO_PUBLIC_KEY, "wb")
-    public_key_file.write(pem)
-    public_key_file.close()
+    with open(PATH_TO_PUBLIC_KEY, "wb") as public_key_file:
+        public_key_file.write(pem)
 
 def generate_keys():
     """ Generate a new private and public key. """
@@ -112,25 +111,26 @@ def generate_keys():
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.BestAvailableEncryption(bpw))
-    private_key_file = open(PATH_TO_PRIVATE_KEY, "wb")
-    private_key_file.write(pem)
-    private_key_file.close()
+    with open(PATH_TO_PRIVATE_KEY, "wb") as private_key_file:
+        private_key_file.write(pem)
     generate_public_key(private_key)
 
 def load_private_key():
     """ Load the private key from its file. """
     bpw = get_bytes_password()
-    key_file = open(PATH_TO_PRIVATE_KEY, "rb")
-    result = serialization.load_pem_private_key(key_file.read(),
-                                                password=bpw,
-                                                backend=default_backend())
+    with open(PATH_TO_PRIVATE_KEY, "rb") as key_file:
+        result = serialization.load_pem_private_key(
+            key_file.read(),
+            password=bpw,
+            backend=default_backend())
     return result
 
 def load_public_key():
     """ Load the public key from its file. """
-    key_file = open(PATH_TO_PUBLIC_KEY, "rb")
-    result = serialization.load_pem_public_key(key_file.read(),
-                                               backend=default_backend())
+    with open(PATH_TO_PUBLIC_KEY, "rb") as key_file:
+        result = serialization.load_pem_public_key(
+            key_file.read(),
+            backend=default_backend())
     return result
 
 ###########

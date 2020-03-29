@@ -132,9 +132,8 @@ def annexe_to_bytes():
     if len(os.listdir("annexe/")) == 0:
         return None
     os.system("zip -r annexe.zip annexe/")
-    annexe_zip = open("annexe.zip", "rb")
-    result = annexe_zip.read()
-    annexe_zip.close()
+    with open("annexe.zip", "rb") as annexe_zip:
+        result = annexe_zip.read()
     os.system("rm annexe.zip")
     return result
 
