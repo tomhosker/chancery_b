@@ -1,7 +1,7 @@
-### This code is a quick script which renews the public and private keys
-### used in making and verifying digital stamps.
+""" This code is a quick script which renews the public and private keys
+used in making and verifying digital stamps. """
 
-# Imports.
+# Standard mports.
 import os
 
 # Local imports.
@@ -11,8 +11,8 @@ from digistamp import generate_keys
 # FUNCTIONS #
 #############
 
-# Delete the present public and private keys, if they exist.
 def delete_keys():
+    """ Delete the present public and private keys, if they exist. """
     print("Are you sure you wish to delete the current public and private "+
           "key? Changing keys may cause unforeseen problems.")
     print("Type \"y\" to continue.")
@@ -21,8 +21,7 @@ def delete_keys():
         os.system("rm -f stamp_private_key.pem")
         os.system("rm -f stamp_public_key.pem")
         return True
-    else:
-        return False
+    return False
 
 ##############
 # RUN SCRIPT #
