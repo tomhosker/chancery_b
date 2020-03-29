@@ -32,9 +32,10 @@ class Extractor:
         ledger. """
         connection = sqlite3.connect("ledger.db")
         connection.row_factory = dict_factory
+        cursor = connection.cursor()
         query = "SELECT * FROM Block WHERE ordinal = ?;"
-        connection.cursor().execute(query, (self.ordinal,))
-        result = connection.cursor().fetchone()
+        cursor.execute(query, (self.ordinal,))
+        result = cursor.fetchone()
         connection.close()
         if result is None:
             raise Exception("No block with ordinal "+str(self.ordinal)+
@@ -89,9 +90,10 @@ class Extractor:
             return
         prev_ordinal = self.ordinal-1
         connection = sqlite3.connect("ledger.db")
+        cursor = connection.cursor()
         query = "SELECT hash FROM Block WHERE ordinal = ?;"
-        connection.cursor().execute(query, (prev_ordinal,))
-        extract = connection.cursor().fetchone()
+        cursor.execute(query, (prev_ordinal,))
+        extract = cursor.fetchone()
         connection.close()
         prev_hash = extract["0"]
         if prev_hash != self.block["prev"]:
