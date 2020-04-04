@@ -3,18 +3,30 @@ This code defines a class which takes a given record in the ledger and
 converts it into a directory.
 """
 
-# Imports.
+# Standard imports.
 import os
 import sqlite3
 import sys
+
+# Non-standard imports.
+from pdfrw import PdfReader, PdfWriter
 
 # Local imports.
 from digistamp.digistamp import Verifier
 from uploader import dict_factory
 
-# Constants.
+# Local constants.
 MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
                "Sep", "Oct", "Nov", "Dec"]
+VERIFICATION_INSTRUCTIONS = ("To verify this Ordinance: (1) Verify that "+
+                             "the hash matches the data. It should be the "+
+                             "hex digest of the SHA256 hash of the data "+
+                             "points. (2) Verify that the stamp matches "+
+                             "the hash, using the public key, standard "+
+                             "padding and, again, SHA256. (To make your "+
+                             "life easier, you could just use the "+
+                             "verification software provided by this "+
+                             "office.)")
 
 ##############
 # MAIN CLASS #
@@ -59,7 +71,7 @@ class Extractor:
         """ Make the code for main.tex, which will then be used build our
         PDF. """
         day_str = str(self.block["day"])
-        if len(day_str) == 0:
+        if len(day_str) == 1:
             day_str = "0"+day_str
         packed_ordinal = str(self.ordinal)
         while len(packed_ordinal) < 3:
@@ -71,7 +83,6 @@ class Extractor:
         result = result.replace("#MONTH_STR", month_str)
         result = result.replace("#YEAR", str(self.block["year"]))
         result = result.replace("#PACKED_ORDINAL", packed_ordinal)
-        result = result.replace("#DIGISTAMP", self.block["stamp"])
         return result
 
     def authenticate(self):
@@ -119,6 +130,24 @@ class Extractor:
                   "pdflatex main.tex")
         os.system(script)
 
+    def add_metadata(self):
+        """ Add the verification metadata to the PDF. """
+        os.system("mv latexery/main.pdf latexery/main_old.pdf")
+        trailer = PdfReader("latexery/main_old.pdf")
+        trailer.Info.instructions = VERIFICATION_INSTRUCTIONS
+        trailer.Info.data_ordinal = self.block["ordinal"]
+        trailer.Info.data_ordinanceType = self.block["ordinanceType"]
+        trailer.Info.data_latex = self.block["latex"]
+        trailer.Info.data_year = self.block["year"]
+        trailer.Info.data_month = self.block["month"]
+        trailer.Info.data_day = self.block["day"]
+        decoded_annexe = self.block["annexe"].hex()
+        trailer.Info.data_annexe = decoded_annexe
+        trailer.Info.data_prev = self.block["prev"]
+        trailer.Info.hash = self.block["hash"]
+        trailer.Info.stamp = self.block["stamp"]
+        PdfWriter("latexery/main.pdf", trailer=trailer).write()
+
     def create_and_copy(self):
         """ Create the directory, and copy the PDF into it. """
         if os.path.isdir("extracts/"+str(self.ordinal)+"/"):
@@ -139,6 +168,7 @@ class Extractor:
         self.authenticate()
         self.write_main_tex()
         self.compile_main_tex()
+        self.add_metadata()
         self.create_and_copy()
         self.write_annexe_zip()
 
@@ -160,7 +190,6 @@ def demo():
     """ Run a demonstration. """
     extractor = Extractor(1)
     extractor.extract()
-    #e.zip_and_delete()
 
 ###################
 # RUN AND WRAP UP #

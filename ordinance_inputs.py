@@ -5,5 +5,5 @@ ordinance_type = "Declaration"
 latex = ("This is the first Ordinance issued by my office. This "+
          "Ordinance, and all future Ordinances, until an Ordinance is "+
          "issued by this office to the contrary, is and will be verified "+
-         "by the \\textbf{SHA256} algorithm and the \\textbf{public key} "+
-         "in the attached annexe.")
+         "by the SHA256 algorithm and the public key in the attached "+
+         "annexe.")

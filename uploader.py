@@ -12,7 +12,7 @@ import sqlite3
 import ordinance_inputs
 from digistamp.digistamp import StampMachine
 
-# Constants.
+# Local constants.
 ENCODING = "utf-8"
 
 ##############
@@ -52,17 +52,17 @@ class Uploader:
 
     def add_hash(self):
         """ Add the hash to the present block. """
-        m = hashlib.sha256()
-        m.update(bytes(self.block.ordinal))
-        m.update(bytes(self.block.ordinance_type, ENCODING))
-        m.update(bytes(self.block.latex, ENCODING))
-        m.update(bytes(self.block.year))
-        m.update(bytes(self.block.month))
-        m.update(bytes(self.block.day))
+        hash_maker = hashlib.sha256()
+        hash_maker.update(bytes(self.block.ordinal))
+        hash_maker.update(bytes(self.block.ordinance_type, ENCODING))
+        hash_maker.update(bytes(self.block.latex, ENCODING))
+        hash_maker.update(bytes(self.block.year))
+        hash_maker.update(bytes(self.block.month))
+        hash_maker.update(bytes(self.block.day))
         if self.block.annexe:
-            m.update(self.block.annexe)
-        m.update(bytes(self.block.prev, ENCODING))
-        self.block.set_the_hash(m.hexdigest())
+            hash_maker.update(self.block.annexe)
+        hash_maker.update(bytes(self.block.prev, ENCODING))
+        self.block.set_the_hash(hash_maker.hexdigest())
 
     def add_new_block(self):
         """ Add a new block to the legder. """
