@@ -35,4 +35,4 @@ To extract a warrant, i.e. to convert a record from the ledger into a PDF, plus 
 1. Find the ordinal of the warrant you wish to extract.
 1. To extract, say, the warrant whose ordinal is 1, run `sh extract_ordinance 1`.
 
-The extract can then be found extracts/ in the subdirectory named for the ordinal of the warrant in question.
+The extract can then be found in extracts/ in the subdirectory named for the ordinal of the warrant in question.
