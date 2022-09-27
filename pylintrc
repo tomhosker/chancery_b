@@ -1,0 +1,9 @@
+[MASTER]
+ignore-patterns=test_*.py
+fail-under=8
+
+[FORMAT]
+max-line-length=80
+
+[MESSAGES CONTROL]
+disable=import-error,no-member,too-many-instance-attributes,unspecified-encoding
