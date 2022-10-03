@@ -1,0 +1,43 @@
+#!/bin/python3
+
+"""
+This code defines a script which uploads an ordinance given an input file.
+"""
+
+# Standard imports.
+import argparse
+
+# Bespoke imports.
+from chancery_b import (
+    upload_ordinance_from_input_file,
+    create_data_dir_as_necessary
+)
+
+#############
+# FUNCTIONS #
+#############
+
+def make_parser():
+    """ Make the parser object. """
+    desc_str = "Upload a given ordinance from a specified input file."
+    result = argparse.ArgumentParser(description=desc_str)
+    result.add_argument(
+        "path_to_input",
+        help="The path to the input file",
+        type=str
+    )
+    return result
+
+###################
+# RUN AND WRAP UP #
+###################
+
+def run():
+    """ Run this file. """
+    parser = make_parser()
+    arguments = parser.parse_args()
+    create_data_dir_as_necessary()
+    upload_ordinance_from_input_file(arguments.path_to_input)
+
+if __name__ == "__main__":
+    run()

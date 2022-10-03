@@ -16,6 +16,7 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 # Local imports.
 from .configs import (
+    ENCODING,
     PATH_TO_PRIVATE_KEY as DEFAULT_PATH_TO_PRIVATE_KEY,
     PATH_TO_PUBLIC_KEY as DEFAULT_PATH_TO_PUBLIC_KEY
 )
@@ -23,7 +24,6 @@ from .configs import (
 # Local constants.
 PUBLIC_EXPONENT = 65537
 KEY_SIZE = 2048
-ENCODING = "utf-8"
 
 ################
 # MAIN CLASSES #
@@ -180,3 +180,13 @@ def load_public_key(path_to_public_key=DEFAULT_PATH_TO_PUBLIC_KEY):
                 backend=default_backend()
             )
     return result
+
+def generate_public_key_from_path(
+        path_to_private_key=DEFAULT_PATH_TO_PRIVATE_KEY,
+        path_to_public_key=DEFAULT_PATH_TO_PUBLIC_KEY,
+        password=None
+    ):
+    """ Generate a file containing a public key from a path to a file
+    containing the private key. """
+    private_key = load_private_key(path_to_private_key, password=password)
+    generate_public_key(private_key, path_to_public_key=path_to_public_key)

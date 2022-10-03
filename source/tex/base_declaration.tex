@@ -1,11 +1,10 @@
 \documentclass[varwidth=true,border=50pt]{standalone}
 
-\usepackage{amsfonts,fancyhdr,graphicx,mathtools,microtype,seqsplit,
-            subcaption}
+\usepackage{amsfonts,fancyhdr,graphicx,mathtools,microtype,seqsplit,subcaption}
 
 \begin{document}
 
-\noindent \includegraphics[width=\textwidth]{le_roi_le_veult}
+\noindent \includegraphics[width=\textwidth]{#PATH_TO_IMAGES/le_roi_le_veult.png}
 
 \vspace{10pt}
 
@@ -21,14 +20,14 @@
 \centering
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=20pt]{c}\\
+    \includegraphics[width=20pt]{#PATH_TO_IMAGES/c.png}\\
     \vspace{5pt}
     \textbf{The Chancellor}\\
     #DAY_STR #MONTH_STR #YEAR
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=0.5\textwidth]{stamp}
+    \includegraphics[width=0.5\textwidth]{#PATH_TO_IMAGES/stamp.png}
 \end{subfigure}%
 \end{figure}
 

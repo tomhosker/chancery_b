@@ -1,0 +1,40 @@
+#!/bin/python3
+
+"""
+This code defines a script which extracts a given ordinance.
+"""
+
+# Standard imports.
+import argparse
+
+# Bespoke imports.
+from chancery_b import (
+    extract_ordinance_with_ordinal,
+    create_data_dir_as_necessary
+)
+
+#############
+# FUNCTIONS #
+#############
+
+def make_parser():
+    """ Make the parser object. """
+    desc_str = "Extract a given ordinance, specified by its ordinal."
+    result = argparse.ArgumentParser(description=desc_str)
+    result.add_argument("ordinal", help="The ordinal in question", type=int)
+    return result
+
+###################
+# RUN AND WRAP UP #
+###################
+
+def run():
+    """ Run this file. """
+    parser = make_parser()
+    arguments = parser.parse_args()
+    create_data_dir_as_necessary()
+    path_to = extract_ordinance_with_ordinal(arguments.ordinal)
+    print("Ordinance extracted to: "+path_to)
+
+if __name__ == "__main__":
+    run()

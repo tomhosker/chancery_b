@@ -1,0 +1,8 @@
+{
+    "ordinance_type": "declaration",
+    "latex": "This is the first ordinance issued by my office. This ordinance, and all future ordinances, until an ordinance is issued by this office to the contrary, is and will be verified by the SHA256 algorithm and the public key in the attached annexe.",
+    "year": 2022,
+    "month_num": 10,
+    "day": 1,
+    "annexe_path": "ord001_annexe"
+}

@@ -1,0 +1,58 @@
+#!/bin/python3
+
+"""
+This code defines a script which generates the public key used by His Majesty's
+Chancery, Formulary B.
+"""
+
+# Standard imports.
+import argparse
+
+# Bespoke imports.
+from chancery_b import (
+    DEFAULT_PATH_TO_PRIVATE_KEY,
+    DEFAULT_PATH_TO_PUBLIC_KEY,
+    generate_public_key_from_path,
+    create_data_dir_as_necessary
+)
+
+#############
+# FUNCTIONS #
+#############
+
+def make_parser():
+    """ Make the parser object. """
+    desc_str = "Upload a given ordinance from a specified input file."
+    result = argparse.ArgumentParser(description=desc_str)
+    result.add_argument(
+        "--path-to-private-key",
+        help="The path from which the private key will be read",
+        type=str,
+        default=DEFAULT_PATH_TO_PRIVATE_KEY,
+        dest="path_to_private_key"
+    )
+    result.add_argument(
+        "--path-to-public-key",
+        help="The path to which the public key will be written",
+        type=str,
+        default=DEFAULT_PATH_TO_PUBLIC_KEY,
+        dest="path_to_public_key"
+    )
+    return result
+
+###################
+# RUN AND WRAP UP #
+###################
+
+def run():
+    """ Run this file. """
+    parser = make_parser()
+    arguments = parser.parse_args()
+    create_data_dir_as_necessary()
+    generate_public_key_from_path(
+        path_to_private_key=arguments.path_to_private_key,
+        path_to_public_key=arguments.path_to_public_key
+    )
+
+if __name__ == "__main__":
+    run()
