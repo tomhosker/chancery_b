@@ -70,11 +70,6 @@ class Uploader:
         self.ordinance.hash = get_hash_of_ordinance(self.ordinance)
         self.ordinance.update_stamp(self.stamp_machine)
 
-        print("Uploader - ordinance:")
-        print(self.ordinance.__dict__)
-        print("Uploader - hash:")
-        print(self.ordinance.hash)
-
     def add_new_block(self):
         """ Add a new block to the legder. """
         attributes_tuple = (

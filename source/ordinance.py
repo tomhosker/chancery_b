@@ -47,11 +47,7 @@ class Ordinance:
             self.month_num = int(trailer.Info.data_month)
             self.day = int(trailer.Info.data_day)
             self.prev = trim_brackets(trailer.Info.data_prev)
-            print(trailer.Info.data_annexe)
-            print(type(trailer.Info.data_annexe))
             self.annexe = trim_and_cast_hex(trailer.Info.data_annexe)
-            print(self.annexe)
-            print(type(self.annexe))
         except Exception as my_exception:
             message = "Error loading metadata: "+str(my_exception)
             raise OrdinanceError(message) from my_exception

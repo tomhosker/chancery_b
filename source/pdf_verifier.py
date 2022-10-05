@@ -59,22 +59,12 @@ class PDFVerifier:
     def check_hash(self):
         """ Check that the hash is what it's supposed to be, given the
         ordinance's data. """
-        print(self.ordinance.__dict__)
         intended_hash = get_hash_of_ordinance(self.ordinance)
-
-        print("Expected hash: "+str(intended_hash))
-        print("Actual hash: "+str(self.hash))
-
         if self.hash != intended_hash:
             raise PDFVerifierError("Failed to verify hash.")
 
     def check_stamp(self):
         """ Verify the stamp against the hash. """
-        print("PDFVerifier - hash:")
-        print(self.hash)
-        print("PDFVerifier - stamp:")
-        print(self.stamp)
-
         if not self.verifier.verify(self.hash, self.stamp):
             raise PDFVerifierError("Failed to verify stamp.")
 

@@ -179,12 +179,6 @@ class Extractor:
     def verify_stamp(self):
         """ Check that this block's stamp is in order. """
         verifier = Verifier(path_to_public_key=self.path_to_public_key)
-
-        print("Extractor - hash:")
-        print(self.block[HASH_COLUMN])
-        print("Extractor - stamp:")
-        print(self.block[STAMP_COLUMN])
-
         verified = \
             verifier.verify(self.block[HASH_COLUMN], self.block[STAMP_COLUMN])
         if not verified:
