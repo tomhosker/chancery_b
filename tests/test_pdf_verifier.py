@@ -28,12 +28,6 @@ GOOD_PDF_FN = "test_pdf_good.pdf"
 # TESTING #
 ###########
 
-def print_key_from_path(path_to):
-    with open(path_to, "r") as key_file:
-        key_string = key_file.read()
-    print("Key at path: "+path_to)
-    print(key_string)
-
 def test_pdf_verifier():
     """ (1) Create a PDF with a bad stamp; (2) create a PDF with a good stamp;
     (3) clean. """
