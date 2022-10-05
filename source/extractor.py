@@ -9,15 +9,18 @@ import os
 import shutil
 import sqlite3
 import subprocess
+from dataclasses import dataclass
 from pathlib import Path
+from typing import ClassVar
 
 # Non-standard imports.
 from pdfrw import PdfReader, PdfWriter
 
 # Local imports.
 from .configs import (
-    PATH_TO_LEDGER,
-    PATH_TO_EXTRACTS,
+    DEFAULT_PATH_TO_LEDGER,
+    DEFAULT_PATH_TO_EXTRACTS,
+    DEFAULT_PATH_TO_PUBLIC_KEY,
     ORDINAL_COLUMN,
     ORDINANCE_TYPE_COLUMN,
     LATEX_COLUMN,
@@ -77,30 +80,40 @@ PATH_TO_IMAGES_MARKER = "#PATH_TO_IMAGES"
 # MAIN CLASS #
 ##############
 
+@dataclass
 class Extractor:
     """ The class in question. """
     # Class attributes.
-    LATEX_COMMAND = "pdflatex"
-    WORKING_STEM = "main"
-    OLD_SUFFIX = "_old"
+    LATEX_COMMAND: ClassVar[str] = "pdflatex"
+    WORKING_STEM: ClassVar[str] = "main"
+    OLD_SUFFIX: ClassVar[str] = "_old"
 
-    def __init__(self, ordinal, clean=True, purge_existing=True):
-        self.ordinal = ordinal
-        self.path_obj_to_extract = Path(PATH_TO_EXTRACTS)/str(self.ordinal)
-        self.block = fetch_block(self.ordinal)
+    # Instance attributes.
+    ordinal: int
+    path_to_extracts: str = DEFAULT_PATH_TO_EXTRACTS
+    path_to_ledger: str = DEFAULT_PATH_TO_LEDGER
+    path_to_public_key: str = DEFAULT_PATH_TO_PUBLIC_KEY
+    path_obj_to_extract: Path = None
+    block: tuple = None
+    main_tex: str = None
+    clean_flag: bool = True
+    purge_existing: bool = False
+
+    def __post_init__(self):
+        self.path_obj_to_extract = \
+            Path(self.path_to_extracts)/str(self.ordinal)
+        self.block = self.fetch_block(self.ordinal)
         self.main_tex = self.make_main_tex()
-        self.clean_flag = clean
-        # Initial actions.
-        if purge_existing:
-            shutil.rmtree(PATH_TO_EXTRACTS, ignore_errors=True)
+        if self.purge_existing:
+            shutil.rmtree(self.path_to_extracts, ignore_errors=True)
 
-    def fetch_block(self):
+    def fetch_block(self, local_ordinal):
         """ Fetch the block matching this object's ordinal from the ledger. """
-        connection = sqlite3.connect(PATH_TO_LEDGER)
+        connection = sqlite3.connect(self.path_to_ledger)
         connection.row_factory = dict_factory
         cursor = connection.cursor()
         query = "SELECT * FROM Block WHERE ordinal = ?;"
-        cursor.execute(query, (self.ordinal,))
+        cursor.execute(query, (local_ordinal,))
         result = cursor.fetchone()
         connection.close()
         if not result:
@@ -156,7 +169,7 @@ class Extractor:
                     "Block with ordinal 1 should be the genesis block."
                 )
             return
-        prev_block = fetch_block(self.ordinal-1)
+        prev_block = self.fetch_block(self.ordinal-1)
         if prev_block[HASH_COLUMN] != self.block[PREV_COLUMN]:
             raise ExtractorError(
                 "Block with ordinal "+str(self.ordinal)+" is not authentic: "+
@@ -165,7 +178,13 @@ class Extractor:
 
     def verify_stamp(self):
         """ Check that this block's stamp is in order. """
-        verifier = Verifier()
+        verifier = Verifier(path_to_public_key=self.path_to_public_key)
+
+        print("Extractor - hash:")
+        print(self.block[HASH_COLUMN])
+        print("Extractor - stamp:")
+        print(self.block[STAMP_COLUMN])
+
         verified = \
             verifier.verify(self.block[HASH_COLUMN], self.block[STAMP_COLUMN])
         if not verified:
@@ -199,7 +218,7 @@ class Extractor:
         trailer = PdfReader(path_to_old)
         trailer.Info.instructions = VERIFICATION_INSTRUCTIONS
         trailer.Info.data_ordinal = self.block[ORDINAL_COLUMN]
-        trailer.Info.data_ordinanceType = self.block[ORDINANCE_TYPE_COLUMN]
+        trailer.Info.data_ordinance_type = self.block[ORDINANCE_TYPE_COLUMN]
         trailer.Info.data_latex = self.block[LATEX_COLUMN]
         trailer.Info.data_year = self.block[YEAR_COLUMN]
         trailer.Info.data_month = self.block[MONTH_COLUMN]
@@ -254,22 +273,9 @@ class Extractor:
         result = str(self.path_obj_to_extract.resolve())
         return result
 
-################################
-# HELPER CLASSES AND FUNCTIONS #
-################################
+################
+# HELPER CLASS #
+################
 
 class ExtractorError(Exception):
     """ A custom exception. """
-
-def fetch_block(ordinal):
-    """ Fetch the block matching this object's ordinal from the ledger. """
-    connection = sqlite3.connect(PATH_TO_LEDGER)
-    connection.row_factory = dict_factory
-    cursor = connection.cursor()
-    query = "SELECT * FROM Block WHERE ordinal = ?;"
-    cursor.execute(query, (ordinal,))
-    result = cursor.fetchone()
-    connection.close()
-    if not result:
-        raise ExtractorError("No block with ordinal: "+str(ordinal))
-    return result

@@ -8,9 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # Local imports.
-from .configs import COMPRESSION_FORMAT, ANNEXE, ARCHIVE_FN
-from .digistamp import StampMachine
-from .utils import raw_to_usable
+from .configs import ANNEXE, ARCHIVE_FN, COMPRESSION_FORMAT, ENCODING
+from .utils import trim_brackets, trim_and_cast_hex
 
 ##############
 # MAIN CLASS #
@@ -42,26 +41,29 @@ class Ordinance:
         """ Fill the attributes of this object using a trailer object. """
         try:
             self.ordinal = int(trailer.Info.data_ordinal)
-            self.ordinance_type = \
-                raw_to_usable(trailer.Info.data_ordinance_type)
-            self.latex = raw_to_usable(trailer.Info.data_latex)
+            self.ordinance_type = trim_brackets(trailer.Info.data_ordinance_type)
+            self.latex = trim_brackets(trailer.Info.data_latex)
             self.year = int(trailer.Info.data_year)
-            self.month = int(trailer.Info.data_month)
+            self.month_num = int(trailer.Info.data_month)
             self.day = int(trailer.Info.data_day)
-            self.prev = raw_to_usable(trailer.Info.data_prev)
-            self.annexe = raw_to_usable(trailer.Info.data_annexe)
+            self.prev = trim_brackets(trailer.Info.data_prev)
+            print(trailer.Info.data_annexe)
+            print(type(trailer.Info.data_annexe))
+            self.annexe = trim_and_cast_hex(trailer.Info.data_annexe)
+            print(self.annexe)
+            print(type(self.annexe))
         except Exception as my_exception:
-            raise OrdinanceError("Error loading metadata.") from my_exception
+            message = "Error loading metadata: "+str(my_exception)
+            raise OrdinanceError(message) from my_exception
 
-    def update_stamp(self):
+    def update_stamp(self, stamp_machine):
         """ Update the stamp attribute, in order to reflect a change in the
         hash attribute. """
-        stamp_machine = StampMachine()
         self.stamp = stamp_machine.make_stamp(self.hash)
 
     def clean(self):
         """ Clean up any temporary generated files. """
-        shutil.rmtree(ANNEXE)
+        shutil.rmtree(ANNEXE, ignore_errors=True)
 
     def update_annexe(self):
         """ Update the annexe attribute, on the basis of what's in the

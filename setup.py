@@ -16,7 +16,8 @@ SCRIPT_PATHS = (
     "scripts/upload-ordinance",
     "scripts/extract-ordinance",
     "scripts/generate-chancery-keys",
-    "scripts/generate-chancery-public-key"
+    "scripts/generate-chancery-public-key",
+    "scripts/verify-ordinance-pdf"
 )
 INSTALL_REQUIRES = ("cryptography", "pdfrw")
 INCLUDE_PACKAGE_DATA = True

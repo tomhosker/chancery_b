@@ -2,33 +2,30 @@
 This code tests the "digistamp" portion of the codebase.
 """
 
-# Standard imports.
-import os
-
 # Source imports.
-from source.digistamp import StampMachine, Verifier, generate_keys
+from source.configs import (
+    TEST_PATH_TO_DATA,
+    TEST_PATH_TO_PRIVATE_KEY,
+    TEST_PATH_TO_PUBLIC_KEY,
+    TEST_PASSWORD
+)
+from source.digistamp import StampMachine, Verifier
+from source.utils import remove_data_dir
 
-# Local constants.
-TEST_PATH_TO_PRIVATE_KEY = "temp_private_key.pem"
-TEST_PATH_TO_PUBLIC_KEY = "temp_public_key.pem"
-TEST_PASSWORD = "guest"
+# Local imports.
+from utils import construct_test_data
 
 ###########
 # TESTING #
 ###########
 
 def test_stamp_machine_and_verifier():
-    """ (1) Generate temporary private and public keys; (2) use those keys in
-    conjuction with the StampMachine class to create a stamp; (3) use that
-    stamp to test the Verifier class. """
+    """ (1) Set up; (2) create a stamp object; (3) use that stamp to test the
+    Verifier class; (4) clean. """
     good_data = "123"
     bad_data = "abc"
-    # Generate keys.
-    generate_keys(
-        path_to_private_key=TEST_PATH_TO_PRIVATE_KEY,
-        path_to_public_key=TEST_PATH_TO_PUBLIC_KEY,
-        password=TEST_PASSWORD
-    )
+    # Set up.
+    construct_test_data()
     # Create stamp.
     stamp_machine = \
         StampMachine(
@@ -41,5 +38,4 @@ def test_stamp_machine_and_verifier():
     assert verifier.verify(good_data, stamp)
     assert not verifier.verify(bad_data, stamp)
     # Clean.
-    os.remove(TEST_PATH_TO_PRIVATE_KEY)
-    os.remove(TEST_PATH_TO_PUBLIC_KEY)
+    remove_data_dir(path_to_data=TEST_PATH_TO_DATA)

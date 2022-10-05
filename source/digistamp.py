@@ -16,9 +16,9 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 # Local imports.
 from .configs import (
-    ENCODING,
-    PATH_TO_PRIVATE_KEY as DEFAULT_PATH_TO_PRIVATE_KEY,
-    PATH_TO_PUBLIC_KEY as DEFAULT_PATH_TO_PUBLIC_KEY
+    DEFAULT_PATH_TO_PRIVATE_KEY,
+    DEFAULT_PATH_TO_PUBLIC_KEY,
+    ENCODING
 )
 
 # Local constants.

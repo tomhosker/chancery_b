@@ -5,13 +5,12 @@ interface for rest of the codebase.
 
 # Standard imports.
 import json
-import shutil
-from pathlib import Path
 
 # Local imports.
-from .configs import PATH_OBJ_TO_DATA, PATH_TO_LEDGER
+from .configs import DEFAULT_PATH_TO_PUBLIC_KEY
 from .extractor import Extractor
 from .ordinance import Ordinance
+from .pdf_verifier import PDFVerifier
 from .uploader import Uploader
 
 #############
@@ -23,18 +22,21 @@ def upload_ordinance_from_input_file(path_to_input_file):
     with open(path_to_input_file, "r") as input_file:
         input_dict = json.loads(input_file.read())
     ordinance = Ordinance(**input_dict)
-    uploader = Uploader(ordinance)
+    uploader = Uploader(ordinance=ordinance)
     uploader.upload()
 
 def extract_ordinance_with_ordinal(ordinal):
     """ Ronseal. """
-    extractor = Extractor(ordinal)
+    extractor = Extractor(ordinal=ordinal)
     result = extractor.extract()
     return result
 
-def create_data_dir_as_necessary():
-    """ Create the data directory, if it doesn't exist. """
-    path_to_empty_ledger = str(Path(__file__).parent/"db"/"empty_ledger.db")
-    if not PATH_OBJ_TO_DATA.exists():
-        PATH_OBJ_TO_DATA.mkdir(parents=True)
-        shutil.copyfile(path_to_empty_ledger, PATH_TO_LEDGER)
+def verify_pdf(path_to_pdf, path_to_public_key=DEFAULT_PATH_TO_PUBLIC_KEY):
+    """ Ronseal. """
+    document_verifier = \
+        PDFVerifier(
+            path_to_pdf=path_to_pdf,
+            path_to_public_key=path_to_public_key
+        )
+    result = document_verifier.verify()
+    return result

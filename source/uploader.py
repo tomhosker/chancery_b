@@ -3,12 +3,17 @@ This code defines a class which uploads an ordinance record to the ledger.
 """
 
 # Standard imports.
-import os
 import sqlite3
 from dataclasses import dataclass
 
 # Local imports.
-from .configs import PATH_TO_LEDGER, ORDINAL_COLUMN, HASH_COLUMN, GENESIS_KEY
+from .configs import (
+    DEFAULT_PATH_TO_LEDGER,
+    DEFAULT_PATH_TO_PRIVATE_KEY,
+    ORDINAL_COLUMN,
+    HASH_COLUMN,
+    GENESIS_KEY
+)
 from .digistamp import StampMachine
 from .ordinance import Ordinance
 from .utils import dict_factory, get_hash_of_ordinance
@@ -17,16 +22,28 @@ from .utils import dict_factory, get_hash_of_ordinance
 # MAIN CLASS #
 ##############
 
+@dataclass
 class Uploader:
     """ The class question. """
-    def __init__(self, ordinance):
-        self.ordinance = ordinance
-        self.connection = None
-        self.cursor = None
+    # Object attributes.
+    ordinance: Ordinance = None
+    path_to_ledger: str = DEFAULT_PATH_TO_LEDGER
+    connection: sqlite3.Connection = None
+    cursor: sqlite3.Cursor = None
+    path_to_private_key: str = DEFAULT_PATH_TO_PRIVATE_KEY
+    password: str = None
+    stamp_machine: StampMachine = None
+
+    def __post_init__(self):
+        self.stamp_machine = \
+            StampMachine(
+                path_to_private_key=self.path_to_private_key,
+                password=self.password
+            )
 
     def make_connection(self):
         """ Ronseal. """
-        self.connection = sqlite3.connect(PATH_TO_LEDGER)
+        self.connection = sqlite3.connect(self.path_to_ledger)
         self.connection.row_factory = dict_factory
         self.cursor = self.connection.cursor()
 
@@ -51,7 +68,12 @@ class Uploader:
     def add_hash(self):
         """ Add the hash to the present block. """
         self.ordinance.hash = get_hash_of_ordinance(self.ordinance)
-        self.ordinance.update_stamp()
+        self.ordinance.update_stamp(self.stamp_machine)
+
+        print("Uploader - ordinance:")
+        print(self.ordinance.__dict__)
+        print("Uploader - hash:")
+        print(self.ordinance.hash)
 
     def add_new_block(self):
         """ Add a new block to the legder. """
