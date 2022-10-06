@@ -6,6 +6,7 @@ This code defines a script which verifies a given ordinance PDF.
 
 # Standard imports.
 import argparse
+import sys
 
 # Bespoke imports.
 from chancery_b import (
@@ -44,15 +45,19 @@ def run():
     """ Run this file. """
     parser = make_parser()
     arguments = parser.parse_args()
-    verified = \
-        verify_pdf(
-            arguments.path_to_pdf,
-            path_to_public_key=arguments.path_to_public_key
-        )
-    if verified:
-        print("Verified PDF at path: "+arguments.path_to_pdf)
-    else:
+    verified = False
+    try:
+        verified = \
+            verify_pdf(
+                arguments.path_to_pdf,
+                path_to_public_key=arguments.path_to_public_key
+            )
+    except Exception as my_exception:
+        print("Exception raised while verifying: "+str(my_exception))
+    if not verified:
         print("Failed to verify PDF at path: "+arguments.path_to_pdf)
+        sys.exit(1)
+    print("Verified PDF at path: "+arguments.path_to_pdf)
 
 if __name__ == "__main__":
     run()
