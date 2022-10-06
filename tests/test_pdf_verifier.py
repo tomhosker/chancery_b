@@ -10,8 +10,7 @@ from source.configs import (
     TEST_PATH_TO_DATA,
     TEST_PATH_TO_EXTRACTS,
     TEST_PATH_TO_LEDGER,
-    TEST_PATH_TO_PUBLIC_KEY,
-    TEST_PATH_TO_PRIVATE_KEY
+    TEST_PATH_TO_PUBLIC_KEY
 )
 from source.extractor import Extractor
 from source.pdf_verifier import PDFVerifier
@@ -21,16 +20,16 @@ from source.utils import remove_data_dir
 from utils import construct_test_data
 
 # Local constants.
-BAD_PDF_FN = "test_pdf_bad.pdf"
 GOOD_PDF_FN = "test_pdf_good.pdf"
+PATH_TO_BAD_PDF = str(Path(__file__).parent/"test_data"/"test_pdf_bad.pdf")
 
 ###########
 # TESTING #
 ###########
 
-def test_pdf_verifier():
-    """ (1) Create a PDF with a bad stamp; (2) create a PDF with a good stamp;
-    (3) clean. """
+def test_pdf_verifier_good():
+    """ (1) Create a PDF with a bad stamp; (2) create PDF with good stamp;
+    (3) test that PDFVerifier object verifies the PDF (4) clean. """
     ordinal = 1
     # Create a PDF with a GOOD stamp.
     path_to_extracted_pdf = \
@@ -55,3 +54,14 @@ def test_pdf_verifier():
     # Clean.
     remove_data_dir(path_to_data=TEST_PATH_TO_DATA)
     Path(GOOD_PDF_FN).unlink()
+
+def test_pdf_verifier_bad():
+    """ Test that PDFVerifier object does NOT verify PDF with bad stamp. """
+    construct_test_data()
+    pdf_verifier = \
+        PDFVerifier(
+            path_to_pdf=PATH_TO_BAD_PDF,
+            path_to_public_key=TEST_PATH_TO_PUBLIC_KEY
+        )
+    assert not pdf_verifier.verify()
+    remove_data_dir(path_to_data=TEST_PATH_TO_DATA)

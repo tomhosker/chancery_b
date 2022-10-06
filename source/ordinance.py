@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # Local imports.
-from .configs import ANNEXE, ARCHIVE_FN, COMPRESSION_FORMAT, ENCODING
-from .utils import trim_brackets, trim_and_cast_hex
+from .configs import ANNEXE, ARCHIVE_FN, COMPRESSION_FORMAT
+from .utils import trim_brackets, trim_and_cast_hex, cast_pdf_int
 
 ##############
 # MAIN CLASS #
@@ -40,12 +40,13 @@ class Ordinance:
     def load_from_trailer(self, trailer):
         """ Fill the attributes of this object using a trailer object. """
         try:
-            self.ordinal = int(trailer.Info.data_ordinal)
-            self.ordinance_type = trim_brackets(trailer.Info.data_ordinance_type)
+            self.ordinal = cast_pdf_int(trailer.Info.data_ordinal)
+            self.ordinance_type = \
+                trim_brackets(trailer.Info.data_ordinance_type)
             self.latex = trim_brackets(trailer.Info.data_latex)
-            self.year = int(trailer.Info.data_year)
-            self.month_num = int(trailer.Info.data_month)
-            self.day = int(trailer.Info.data_day)
+            self.year = cast_pdf_int(trailer.Info.data_year)
+            self.month_num = cast_pdf_int(trailer.Info.data_month)
+            self.day = cast_pdf_int(trailer.Info.data_day)
             self.prev = trim_brackets(trailer.Info.data_prev)
             self.annexe = trim_and_cast_hex(trailer.Info.data_annexe)
         except Exception as my_exception:

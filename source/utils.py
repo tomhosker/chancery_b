@@ -56,6 +56,16 @@ def trim_and_cast_hex(raw):
     result = bytes.fromhex(trimmed)
     return result
 
+def cast_pdf_int(raw):
+    """ Cast a PDF represention of an integer into an actual integer. """
+    if not raw:
+        return None
+    try:
+        result = int(raw)
+    except ValueError:
+        result = int(trim_brackets(raw))
+    return result
+
 def raw_to_usable(raw):
     """ Convert the raw bytes into a more usable form. """
     if not raw:
