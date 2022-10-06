@@ -19,7 +19,7 @@ SCRIPT_PATHS = (
     "scripts/generate-chancery-public-key",
     "scripts/verify-ordinance-pdf"
 )
-INSTALL_REQUIRES = ("cryptography", "pdfrw")
+INSTALL_REQUIRES = ("cryptography", "hosker_utils", "pdfrw")
 INCLUDE_PACKAGE_DATA = True
 
 ###################################

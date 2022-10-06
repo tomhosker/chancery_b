@@ -18,21 +18,44 @@ Note that the code in this repository is intended to run a **Linux** machine.
 
 To install Formulary B:
 
-1. Download a copy of this repository into the home directory of your computer.
+1. Download a copy of this repository onto your computer.
 1. From the command line, navigate to that copy.
-1. Run `sh install_externals`.
+1. Run `pip install .`.
+1. Run `python3 install_specials.py`.
+
+### Generating Keys
+
+If you need to generate new **public** and **private keys**, simply run:
+
+```sh
+    generate-chancery-keys
+```
+
+You will be prompted in due course for a password with which to use the private key.
+
+## Usage
 
 ### Create and Upload a New Warrant
 
-1. Update ordinance_inputs.py and annexe/ as required.
-1. Run `sh upload_ordinance`.
+1. Prepare an ordinance inputs JSON file. (See `example_input_files` for guidance.)
+1. Run `upload-ordinance path/to/inputs.json`.
+
+You will be prompted for a password with which to use the private key.
 
 ### Extract a Warrant
 
 To extract a warrant, i.e. to convert a record from the ledger into a PDF, plus annexe(s):
 
-1. Open ledger.db.
+1. Open the ledger; the default path is `~/chancery_b_data/ledger.db`.
 1. Find the ordinal of the warrant you wish to extract.
-1. To extract, say, the warrant whose ordinal is 1, run `sh extract_ordinance 1`.
+1. To extract, say, the warrant whose ordinal is 1, run `extract-ordinance 1`.
 
-The extract can then be found in extracts/ in the subdirectory named for the ordinal of the warrant in question.
+The extract can then be found in the `extracts` folder, which should be in the same directory as the ledger.
+
+### Verify a Warrant
+
+Simply run:
+
+```sh
+    verify-ordinance-pdf path/to/warrant.pdf
+```
